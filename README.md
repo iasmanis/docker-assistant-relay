@@ -1,25 +1,13 @@
 # docker-assistant-relay
 
-### Note: This is based on Assistant Relay V2, not the newer V3. I have no intentions of supporting V3 at this time, but you are welcome to fork this repository if you would like.
-
 First time setup:
 
-Follow the instructions to setup Assistant Relay [here](https://github.com/greghesp/assistant-relay/blob/master/readMe.md) until you get to the section for running the relay. Then run:
-```
-docker run --rm -it \
-    -v /path/to/host/folder/secrets:/assistant-relay/server/configurations/secrets \
-    -v /path/to/host/folder/tokens:/assistant-relay/server/configurations/tokens \
-    kmlucy/docker-assistant-relay
-```
-Copy the url and paste it into a browser. Follow the steps online until it presents you with a code. Paste that code into the terminal and press enter. You should get a message that Assistant Relay is running.
+Follow the instructions to setup Assistant Relay [here](https://github.com/greghesp/assistant-relay/blob/master/readMe.md).
 
-If you want to modify the configuration, copy out the config file:
-```
-docker cp assistant-relay:/assistant-relay/server/configurations/config.json /path/to/host/folder/config.json
-```
-You can now close the container.
+
 
 After setup, you can run it with:
+
 ```
 docker run --rm -d \
     --name assistant-relay -p 3000:3000
@@ -27,10 +15,25 @@ docker run --rm -d \
     -v /path/to/host/folder/tokens:/assistant-relay/server/configurations/tokens:ro \
     -v /path/to/host/folder/config.json:/assistant-relay/server/configurations/config.json \
     -e TZ=America/New_York \
-    kmlucy/docker-assistant-relay
+    ingemars/assistant-relay:3.2.0
+```
+
+In docker swarm mode:
+
+```
+docker service create \
+    --name assistant-relay \
+    --detach=false \
+    --publish 3000:3000 \
+    -e TZ=Europe/Riga \
+    --mount "type=bind,source=/path/to/host/folder/secrets,target=/assistant-relay/server/configurations/secrets" \
+    --mount "type=bind,source=/path/to/host/folder/tokens,target=/assistant-relay/server/configurations/tokens" \
+    --mount "type=bind,source=/path/to/host/folder/config.json,target=/assistant-relay/server/configurations/config.json" \
+    ingemars/assistant-relay:3.2.0
 ```
 
 If you are using it in Home Assistant, you can set up noficiation agents as follows:
+
 ```
 # Notifications
 notify:
@@ -51,4 +54,4 @@ notify:
       user: !secret relay_user
 ```
 
-Based on [greghesp/assistant-relay V2](https://github.com/greghesp/assistant-relay/tree/master)
+Based on [greghesp/assistant-relay](https://github.com/greghesp/assistant-relay/tree/master)

@@ -1,12 +1,20 @@
-FROM node:8-alpine
-LABEL maintainer "Kyle Lucy <kmlucy@gmail.com>"
+FROM node:10-alpine
 
-RUN apk add --no-cache git tzdata && \
-    git clone https://github.com/greghesp/assistant-relay.git && \
-    cd assistant-relay && \
-    git checkout v2.1.1 && \
-    npm install && \
-    apk del git
+
+ARG ASSISTANT_RELAY_VERSION=v3.2.0
+
+LABEL build_version="version: ${ASSISTANT_RELAY_VERSION}"
+LABEL maintainer="iasmanis"
+
+RUN true && \
+    apk add --no-cache wget zip tzdata && \
+    wget https://github.com/greghesp/assistant-relay/releases/download/${ASSISTANT_RELAY_VERSION}/release.zip && \
+    unzip release.zip -d /assistant-relay && \
+    rm -f release.zip && \
+    cd /assistant-relay && \
+    npm run setup && \
+    apk del --purge wget zip && \
+    rm -rf /tmp/* /var/cache/apk/* &> /dev/null
 
 VOLUME /assistant-relay/server/configurations/secrets
 VOLUME /assistant-relay/server/configurations/tokens
